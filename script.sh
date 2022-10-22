@@ -91,18 +91,18 @@ for value in $IPADDRESSES; do
 
     if [ "$NETWORKINTERFACES" = "lo0 xn0" ]; then
         echo "Bad network interface (xn0) on $value. Destroying instance"
-# Obtaining instance name based on the public IP address.
+        # Obtaining instance name based on the public IP address.
         INSTANCE_NAME=$(aws lightsail get-instances \
-    --region $INPUT_REGION \
-    --query "instances[?publicIpAddress==\`$value\`].name" \
-    --profile=$PROFILE \
-    --output=text)
+        --region $INPUT_REGION \
+        --query "instances[?publicIpAddress==\`$value\`].name" \
+        --profile=$PROFILE \
+        --output=text)
 
-# Destroying undesired instance.
-    aws lightsail delete-instance \
---instance-name $INSTANCE_NAME \
---region $INPUT_REGION \
---profile=$PROFILE
+        # Destroying undesired instance.
+        aws lightsail delete-instance \
+        --instance-name $INSTANCE_NAME \
+        --region $INPUT_REGION \
+        --profile=$PROFILE
     else
         echo "Good network interface (NOT lo0 xn0). Notifying via Telegram"
         sendTelegramMessage "$value seems to be a good instance. Please double check."
@@ -111,14 +111,12 @@ done
 }
 
 # Send messages to Telegram bot.
-function sendTelegramMessage() {
-
-        # Use "$1" to get the first argument (desired message) passed to this function
-        # Set parsing mode to HTML because Markdown tags don't play nice in bash script
-        # Redirect curl output to /dev/null since we don't need to see it (it just replays the message from the bot API)
-        # Redirect stderr to stdout so we can still see an error message in curl if it occurs
-        curl -s -X POST $telegram_boturl -d chat_id=$telegram_chatid -d text="$1" -d parse_mode="HTML" > /dev/null 2>&1
-
+sendTelegramMessage() {
+# Use "$1" to get the first argument (desired message) passed to this function
+# Set parsing mode to HTML because Markdown tags don't play nice in bash script
+# Redirect curl output to /dev/null since we don't need to see it (it just replays the message from the bot API)
+# Redirect stderr to stdout so we can still see an error message in curl if it occurs
+curl -s -X POST $telegram_boturl -d chat_id=$telegram_chatid -d text="$1" -d parse_mode="HTML" > /dev/null 2>&1
 }
 
 
