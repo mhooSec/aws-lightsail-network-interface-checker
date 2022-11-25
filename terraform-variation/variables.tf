@@ -63,6 +63,6 @@ variable "REMOTE_USER" {
 
 variable "aws_profile" {
   description = "AWS profile we want to use, in order to identify relevant credentials"
-  default = "alex"
+  default = "default"
   type = string
 }
