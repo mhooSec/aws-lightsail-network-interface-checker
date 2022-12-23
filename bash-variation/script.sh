@@ -4,9 +4,11 @@
 # Lightsail related variables.
 PROFILE=""
 OPERATING_SYSTEM="freebsd_12"
-INSTANCE_TYPE="nano_2_0" # 3.5 USD
-# INSTANCE_TYPE="micro_2_0" # 5 USD
-# INSTANCE_TYPE="small_2_0" # 10 USD
+INSTANCE_TYPE_NAME="Nano" # 3.5 USD
+# INSTANCE_TYPE_NAME="Micro" # 5 USD
+# INSTANCE_TYPE_NAME="Small" # 10 USD
+# INSTANCE_TYPE_NAME="Medium" # 20 USD
+# INSTANCE_TYPE_NAME="Large" # 40 USD
 
 # Telegram notification related variables.
 telegram_token=""
@@ -46,6 +48,12 @@ obtainLightsailRegionAvailabilityZones() {
 	echo ""
 	echo "An instance will be deployed in each availability region, which may incur in significant costs. Please remember that Lightsail charges on an hourly basis. Press Enter key to continue, or CTRL+C to abort."
 	read CONFIRMATION
+}
+
+# Obtaining instance_type value based on the instance type name in a specific region.
+obtainInstanceType() {
+	INSTANCE_TYPE=$(aws lightsail get-bundles --query "bundles[?name=='$INSTANCE_TYPE_NAME'] | [?supportedPlatforms[0]=='LINUX_UNIX'].bundleId" --region $INPUT_REGION --profile=$PROFILE | jq '.[]' -r)
+	echo "The instance_type identifier for this region is $INSTANCE_TYPE."
 }
 
 # Creating instances in each availability zone of selected Lightsail region.
@@ -126,6 +134,9 @@ obtainLightsailRegions
 
 # Fetching all availability zones inside of the selected region. We want to deploy an instance in each availability zone.
 obtainLightsailRegionAvailabilityZones $INPUT_REGION
+
+# Obtaining instance_type value for a given instance type name in a specific region
+obtainInstanceType
 
 # Downloading default Lightsail SSH key for the selected region.
 downloadDefaultSSHKey
