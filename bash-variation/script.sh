@@ -52,7 +52,10 @@ obtainLightsailRegionAvailabilityZones() {
 
 # Obtaining instance_type value based on the instance type name in a specific region.
 obtainInstanceType() {
-	INSTANCE_TYPE=$(aws lightsail get-bundles --query "bundles[?name=='$INSTANCE_TYPE_NAME'] | [?supportedPlatforms[0]=='LINUX_UNIX'].bundleId" --region $INPUT_REGION --profile=$PROFILE | jq '.[]' -r)
+	INSTANCE_TYPE=$(aws lightsail get-bundles \
+	--query "bundles[?name=='$INSTANCE_TYPE_NAME'] | [?supportedPlatforms[0]=='LINUX_UNIX'].bundleId" \
+	--region $INPUT_REGION \
+	--profile=$PROFILE | jq '.[]' -r)
 	echo "The instance_type identifier for this region is $INSTANCE_TYPE."
 }
 
